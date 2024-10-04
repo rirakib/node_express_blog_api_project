@@ -1,9 +1,10 @@
 const express = require("express")
+const adminRoute = express.Router()
 
 const categoryController = require("../controllers/admin/category.controller")
 const postController = require("../controllers/admin/post.controller")
 
-const adminRoute = express.Router()
+
 
 
 adminRoute.route("/categories")

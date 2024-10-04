@@ -1,6 +1,4 @@
 const mongoose = require("mongoose")
-require('dotenv').config()
-const moment = require("moment-timezone");
 
 
 const Schema = new mongoose.Schema({
@@ -14,7 +12,7 @@ const Schema = new mongoose.Schema({
     },
     createdAt: {
         type : Date,
-        default: () => moment().tz(process.env.TIMEZONE).toDate()
+        default:Date.now()
     }
 })
 
