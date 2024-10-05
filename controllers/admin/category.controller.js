@@ -1,4 +1,5 @@
 const Category = require("../../models/category.js")
+const { createCategoryValidateSchema } = require("../../validatorSchema/category.schema.js")
 
 exports.allCategory = async (req, res) => {
     try {
@@ -15,6 +16,11 @@ exports.allCategory = async (req, res) => {
 exports.createCategory = async (req, res) => {
     try {
 
+        const {error} = createCategoryValidateSchema.validate(req.body,{ abortEarly:false})
+
+        if(error){
+            return res.status(400).json({message: error.details.map(err => err.message)})
+        }
         const title = req.body.title
 
         const cat = new Category({
