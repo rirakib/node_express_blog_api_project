@@ -2,7 +2,7 @@ require('dotenv').config()
 const User = require("../../models/user.js")
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
-const { registerSchema } = require('../../validatorSchema/auth.schema.js');
+const { registerSchema, loginSchema } = require('../../validatorSchema/auth.schema.js');
 
 
 
@@ -55,6 +55,12 @@ exports.login = async (req, res) => {
 
     try {
 
+        const {error} = loginSchema.validate(req.body, { abortEarly: false })
+
+        if(error){
+            return res.status(400).json({ message: error.details.map(err => err.message) });
+        }
+
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -68,7 +74,7 @@ exports.login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user._id, email: user.email },
+            { id: user._id, email: user.email,isAdmin:user.isAdmin },
             process.env.JWT_SECRET,
             { expiresIn: '3h' }
         );
