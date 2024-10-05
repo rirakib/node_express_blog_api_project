@@ -1,23 +1,25 @@
+require('dotenv').config()
 const User = require("../../models/user.js")
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
-require('dotenv').config()
-const { body, validationResult } = require('express-validator');
+const { registerSchema } = require('../../validatorSchema/auth.schema.js');
+
+
+
 
 
 exports.register = async (req, res) => {
 
 
-    await body('name').notEmpty().withMessage('Name is required').run(req);
-    await body('email').isEmail().withMessage('Invalid email').run(req);
-    await body('password').isLength({ min: 4 }).withMessage('Password must be at least 6 characters').run(req);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
 
     try {
+
+        const { error } = registerSchema.validate(req.body, { abortEarly: false })
+
+        if (error) {
+            return res.status(400).json({ message: error.details.map(err => err.message) });
+        }
+
         const { name, email, password } = req.body;
 
         const existingUser = await User.findOne({ email });
@@ -71,7 +73,7 @@ exports.login = async (req, res) => {
             { expiresIn: '3h' }
         );
 
-        return res.status(200).json({ message:"Login successfull",token:token });
+        return res.status(200).json({ message: "Login successfull", token: token });
 
     } catch (error) {
         return res.status(500).json({ message: 'Error logging in', error: error.message });
